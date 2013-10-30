@@ -82,8 +82,8 @@ class PayPalPDT(PayPalStandardBase):
             else:
                 if self.st != "SUCCESS":
                     self.set_flag(line)
-                    LOGGER.error("Paypal's postback validation has errors: %s" %
-                                 self.response)
+                    LOGGER.error("Paypal's postback validation has errors: "
+                                 "%s" % self.response)
                     break
                 try:                        
                     if not unquoted_line.startswith(' -'):
