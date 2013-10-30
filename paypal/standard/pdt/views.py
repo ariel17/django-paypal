@@ -42,6 +42,7 @@ def pdt(request, item_check_callable=None, template="pdt/pdt.html", context=None
             if form.is_valid():
                 try:
                     pdt_obj = form.save(commit=False)
+                    pdt_obj.tx = txn_id  # backward compatibillity
                 except Exception, e:
                     LOGGER.exception("Exception creating PDT object from "
                                      "formulary:")
