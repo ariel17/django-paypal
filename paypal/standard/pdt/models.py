@@ -1,14 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+
 from urllib import unquote_plus
 import urllib2
+import logging
+
 from django.db import models
 from django.conf import settings
 from django.http import QueryDict
 from django.utils.http import urlencode
+
 from paypal.standard.models import PayPalStandardBase
 from paypal.standard.conf import POSTBACK_ENDPOINT, SANDBOX_POSTBACK_ENDPOINT
 from paypal.standard.pdt.signals import pdt_successful, pdt_failed
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 # ### Todo: Move this logic to conf.py:
@@ -16,6 +24,7 @@ from paypal.standard.pdt.signals import pdt_successful, pdt_failed
 # ... then check for this setting in conf.py
 class PayPalSettingsError(Exception):
     """Raised when settings are incorrect."""
+
 
 try:
     IDENTITY_TOKEN = settings.PAYPAL_IDENTITY_TOKEN
@@ -43,6 +52,9 @@ class PayPalPDT(PayPalStandardBase):
         SUCCESS or FAILED.
         """
         postback_dict = dict(cmd="_notify-synch", at=IDENTITY_TOKEN, tx=self.tx)
+        LOGGER.debug("Postback: URL=%s, parameters=%s" % (self.get_endpoint(),
+                     postback_dict))
+
         postback_params = urlencode(postback_dict)
         return urllib2.urlopen(self.get_endpoint(), postback_params).read()
 
