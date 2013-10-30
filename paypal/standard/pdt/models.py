@@ -51,7 +51,8 @@ class PayPalPDT(PayPalStandardBase):
         Sends the transaction ID and business token to PayPal which responses with
         SUCCESS or FAILED.
         """
-        postback_dict = dict(cmd="_notify-synch", at=IDENTITY_TOKEN, tx=self.tx)
+        postback_dict = dict(cmd="_notify-synch", at=IDENTITY_TOKEN,
+                             txn_id=self.txn_id)
         LOGGER.debug("Postback: URL=%s, parameters=%s" % (self.get_endpoint(),
                      postback_dict))
 
