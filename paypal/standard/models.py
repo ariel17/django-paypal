@@ -252,7 +252,7 @@ class PayPalStandardBase(Model):
 
         """
         self.response = self._postback()
-        self._verify_postback()  
+        self._verify_postback()
         if not self.flag:
             if self.is_transaction():
                 if self.payment_status not in self.PAYMENT_STATUS_CHOICES:
