@@ -52,7 +52,7 @@ class PayPalPDT(PayPalStandardBase):
         SUCCESS or FAILED.
         """
         postback_dict = dict(cmd="_notify-synch", at=IDENTITY_TOKEN,
-                             txn_id=self.txn_id)
+                             tx=self.txn_id)
         LOGGER.debug("Postback: URL=%s, parameters=%s" % (self.get_endpoint(),
                      postback_dict))
 
@@ -78,9 +78,12 @@ class PayPalPDT(PayPalStandardBase):
                 self.st = unquoted_line
                 if self.st == "SUCCESS":
                     result = True
+                    LOGGER.info("Paypal's postback validation was succesful.")
             else:
                 if self.st != "SUCCESS":
                     self.set_flag(line)
+                    LOGGER.error("Paypal's postback validation has errors: %s" %
+                                 self.response)
                     break
                 try:                        
                     if not unquoted_line.startswith(' -'):
