@@ -39,8 +39,6 @@ def pdt(request, item_check_callable=None, template="pdt/pdt.html", context=None
 
         if pdt_obj is None:
             form = PayPalPDTForm(request.POST)
-            LOGGER.debug("Form PDT from POST=%s" % form)
-
             if form.is_valid():
                 try:
                     pdt_obj = form.save(commit=False)

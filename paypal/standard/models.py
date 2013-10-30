@@ -1,8 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+import logging
+
 from django.db import models
+
 from paypal.standard.helpers import duplicate_txn_id, check_secret
 from paypal.standard.conf import RECEIVER_EMAIL, POSTBACK_ENDPOINT, SANDBOX_POSTBACK_ENDPOINT
+
+
+LOGGER = logging.getLogger(__name__)
 
 ST_PP_ACTIVE = 'Active'
 ST_PP_CANCELLED = 'Cancelled'
