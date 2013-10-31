@@ -100,18 +100,20 @@ class PayPalPaymentsForm(forms.Form):
         self.button_type = button_type
 
     def render(self):
+        if settings.PAYPAL_SANDBOX:  # rendering with sandbox if it is enabled.
+            return self.sandbox()
+
         return mark_safe(u"""<form action="%s" method="post">
     %s
     <input type="image" src="%s" border="0" name="submit" alt="Buy it Now" />
 </form>""" % (POSTBACK_ENDPOINT, self.as_p(), self.get_image()))
-        
-        
+
     def sandbox(self):
         return mark_safe(u"""<form action="%s" method="post">
     %s
     <input type="image" src="%s" border="0" name="submit" alt="Buy it Now" />
 </form>""" % (SANDBOX_POSTBACK_ENDPOINT, self.as_p(), self.get_image()))
-        
+
     def get_image(self):
         return {
             (True, self.SUBSCRIBE): SUBSCRIPTION_SANDBOX_IMAGE,
