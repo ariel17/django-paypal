@@ -17,7 +17,7 @@ PAYPAL_DATE_FORMAT = ("%H:%M:%S %b. %d, %Y PST",
                       "%H:%M:%S %b %d, %Y PST",
                       "%H:%M:%S %b %d, %Y PDT",)
 
-class PayPalPaymentsForm(forms.ModelForm):
+class PayPalPaymentsForm(forms.Form):
     """
     Creates a PayPal Payments Standard "Buy It Now" button, configured for a
     selling a single item with no shipping.
@@ -29,8 +29,7 @@ class PayPalPaymentsForm(forms.ModelForm):
     >>> f = PayPalPaymentsForm(initial={'item_name':'Widget 001', ...})
     >>> f.render()
     u'<form action="https://www.paypal.com/cgi-bin/webscr" method="post"> ...'
-    
-    """    
+    """
     CMD_CHOICES = (
         ("_xclick", "Buy now or Donations"), 
         ("_cart", "Shopping cart"), 
@@ -57,7 +56,8 @@ class PayPalPaymentsForm(forms.ModelForm):
 <form action="%s" method="%s">
     %s
     <input type="image" src="%s" border="0" name="submit" alt="Buy it Now" />
-</form>""".strip()
+</form>
+""".strip()
 
     # Where the money goes.
     business = forms.CharField(widget=ValueHiddenInput(), initial=RECEIVER_EMAIL)
