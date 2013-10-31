@@ -111,12 +111,12 @@ class PayPalPaymentsForm(forms.Form):
         if settings.PAYPAL_SANDBOX:  # rendering with sandbox if it is enabled.
             return self.sandbox()
 
-        return mark_safe(_FORM_TEMPLATE % (POSTBACK_ENDPOINT, FORM_METHOD,
-                         self.as_p(), self.get_image()))
+        return mark_safe(self._FORM_TEMPLATE % (POSTBACK_ENDPOINT,
+                         self.FORM_METHOD, self.as_p(), self.get_image()))
 
     def sandbox(self):
-        return mark_safe(_FORM_TEMPLATE % (SANDBOX_POSTBACK_ENDPOINT,
-                         FORM_METHOD, self.as_p(), self.get_image()))
+        return mark_safe(self._FORM_TEMPLATE % (SANDBOX_POSTBACK_ENDPOINT,
+                         self.FORM_METHOD, self.as_p(), self.get_image()))
 
     def get_image(self):
         return {
