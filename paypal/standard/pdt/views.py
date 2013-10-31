@@ -6,7 +6,6 @@ import logging
 
 from django.template import RequestContext
 from django.shortcuts import render_to_response
-from django.views.decorators.http import require_POST
 
 from paypal.standard.pdt.models import PayPalPDT
 from paypal.standard.pdt.forms import PayPalPDTForm
@@ -15,16 +14,19 @@ from paypal.standard.pdt.forms import PayPalPDTForm
 LOGGER = logging.getLogger(__name__)
 
 
-@require_POST
-def pdt(request, item_check_callable=None, template="pdt/pdt.html", context=None):
+def pdt(request, item_check_callable=None, template="pdt/pdt.html",
+        context=None):
     """Payment data transfer implementation: http://tinyurl.com/c9jjmw"""
 
+    LOGGER.debug(">> Paypal's notification request: method=%s" %
+                 request.method)
+    LOGGER.debug("GET=%s" % repr(request.GET))
     LOGGER.debug("POST=%s" % repr(request.POST))
 
     context = context or {}
     pdt_obj = None
 
-    txn_id = request.POST.get('txn_id')
+    txn_id = getattr(request, request.method).get('txn_id', None)
     LOGGER.info("PDT transaction id: %s" % repr(txn_id))
 
     failed = False
@@ -38,7 +40,7 @@ def pdt(request, item_check_callable=None, template="pdt/pdt.html", context=None
                          "PDT request")
 
         if pdt_obj is None:
-            form = PayPalPDTForm(request.POST)
+            form = PayPalPDTForm(getattr(request, request.method))
             if form.is_valid():
                 try:
                     pdt_obj = form.save(commit=False)
