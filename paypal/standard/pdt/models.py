@@ -1,20 +1,30 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+
 from urllib import unquote_plus
 import urllib2
+import logging
+
 from django.db import models
 from django.conf import settings
 from django.http import QueryDict
 from django.utils.http import urlencode
+
 from paypal.standard.models import PayPalStandardBase
 from paypal.standard.conf import POSTBACK_ENDPOINT, SANDBOX_POSTBACK_ENDPOINT
 from paypal.standard.pdt.signals import pdt_successful, pdt_failed
+
+
+LOGGER = logging.getLogger(__name__)
+
 
 # ### Todo: Move this logic to conf.py:
 # if paypal.standard.pdt is in installed apps
 # ... then check for this setting in conf.py
 class PayPalSettingsError(Exception):
     """Raised when settings are incorrect."""
+
 
 try:
     IDENTITY_TOKEN = settings.PAYPAL_IDENTITY_TOKEN
@@ -40,19 +50,22 @@ class PayPalPDT(PayPalStandardBase):
         Perform PayPal PDT Postback validation.
         Sends the transaction ID and business token to PayPal which responses with
         SUCCESS or FAILED.
-        
         """
-        postback_dict = dict(cmd="_notify-synch", at=IDENTITY_TOKEN, tx=self.tx)
+        postback_dict = dict(cmd="_notify-synch", at=IDENTITY_TOKEN,
+                             tx=self.txn_id)
+        LOGGER.debug("Postback: URL=%s, parameters=%s" % (self.get_endpoint(),
+                     postback_dict))
+
         postback_params = urlencode(postback_dict)
         return urllib2.urlopen(self.get_endpoint(), postback_params).read()
-    
+
     def get_endpoint(self):
         """Use the sandbox when in DEBUG mode as we don't have a test_ipn variable in pdt."""
         if getattr(settings, 'PAYPAL_DEBUG', settings.DEBUG):
             return SANDBOX_POSTBACK_ENDPOINT
         else:
             return POSTBACK_ENDPOINT
-    
+
     def _verify_postback(self):
         # ### Now we don't really care what result was, just whether a flag was set or not.
         from paypal.standard.pdt.forms import PayPalPDTForm
@@ -65,9 +78,12 @@ class PayPalPDT(PayPalStandardBase):
                 self.st = unquoted_line
                 if self.st == "SUCCESS":
                     result = True
+                    LOGGER.info("Paypal's postback validation was succesful.")
             else:
                 if self.st != "SUCCESS":
                     self.set_flag(line)
+                    LOGGER.error("Paypal's postback validation has errors: "
+                                 "%s" % self.response)
                     break
                 try:                        
                     if not unquoted_line.startswith(' -'):
@@ -81,7 +97,7 @@ class PayPalPDT(PayPalStandardBase):
         qd.update(dict(ipaddress=self.ipaddress, st=self.st, flag_info=self.flag_info))
         pdt_form = PayPalPDTForm(qd, instance=self)
         pdt_form.save(commit=False)
-        
+
     def send_signals(self):
         # Send the PDT signals...
         if self.flag:

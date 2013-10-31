@@ -22,3 +22,16 @@ SANDBOX_IMAGE = getattr(settings, "PAYPAL_SANDBOX_IMAGE", "https://www.sandbox.p
 SUBSCRIPTION_SANDBOX_IMAGE = getattr(settings, "PAYPAL_SUBSCRIPTION_SANDBOX_IMAGE", "https://www.sandbox.paypal.com/en_US/i/btn/btn_subscribeCC_LG.gif")
 DONATION_SANDBOX_IMAGE = getattr(settings, "PAYPAL_DONATION_SANDBOX_IMAGE", "https://www.sandbox.paypal.com/en_US/i/btn/btn_donateCC_LG.gif")
 
+# "payment_status" request paremeter values
+# Source: https://developer.paypal.com/webapps/developer/docs/classic/ipn/integration-guide/IPNandPDTVariables/
+PAYMENT_STATUS_CANCELED_REVERSAL = "Canceled_Reversal"
+PAYMENT_STATUS_COMPLETED = "Completed"
+PAYMENT_STATUS_CREATED = "Created"
+PAYMENT_STATUS_DENIED = "Denied"
+PAYMENT_STATUS_EXPIRED = "Expired"
+PAYMENT_STATUS_FAILED = "Failed"
+PAYMENT_STATUS_PENDING = "Pending"
+PAYMENT_STATUS_REFUNDED = "Refunded"
+PAYMENT_STATUS_REVERSED = "Reversed"
+PAYMENT_STATUS_PROCESSED = "Processed"
+PAYMENT_STATUS_VOIDED = "Voided"
