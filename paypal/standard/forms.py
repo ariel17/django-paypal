@@ -17,7 +17,7 @@ PAYPAL_DATE_FORMAT = ("%H:%M:%S %b. %d, %Y PST",
                       "%H:%M:%S %b %d, %Y PST",
                       "%H:%M:%S %b %d, %Y PDT",)
 
-class PayPalPaymentsForm(forms.Form):
+class PayPalPaymentsForm(forms.ModelForm):
     """
     Creates a PayPal Payments Standard "Buy It Now" button, configured for a
     selling a single item with no shipping.
@@ -50,6 +50,14 @@ class PayPalPaymentsForm(forms.Form):
     BUY = 'buy'
     SUBSCRIBE = 'subscribe'
     DONATE = 'donate'
+
+    FORM_METHOD = "post"
+
+    _FORM_TEMPLATE = u"""
+<form action="%s" method="%s">
+    %s
+    <input type="image" src="%s" border="0" name="submit" alt="Buy it Now" />
+</form>""".strip()
 
     # Where the money goes.
     business = forms.CharField(widget=ValueHiddenInput(), initial=RECEIVER_EMAIL)
@@ -103,16 +111,12 @@ class PayPalPaymentsForm(forms.Form):
         if settings.PAYPAL_SANDBOX:  # rendering with sandbox if it is enabled.
             return self.sandbox()
 
-        return mark_safe(u"""<form action="%s" method="post">
-    %s
-    <input type="image" src="%s" border="0" name="submit" alt="Buy it Now" />
-</form>""" % (POSTBACK_ENDPOINT, self.as_p(), self.get_image()))
+        return mark_safe(_FORM_TEMPLATE % (POSTBACK_ENDPOINT, FORM_METHOD,
+                         self.as_p(), self.get_image()))
 
     def sandbox(self):
-        return mark_safe(u"""<form action="%s" method="post">
-    %s
-    <input type="image" src="%s" border="0" name="submit" alt="Buy it Now" />
-</form>""" % (SANDBOX_POSTBACK_ENDPOINT, self.as_p(), self.get_image()))
+        return mark_safe(_FORM_TEMPLATE % (SANDBOX_POSTBACK_ENDPOINT,
+                         FORM_METHOD, self.as_p(), self.get_image()))
 
     def get_image(self):
         return {
@@ -132,6 +136,12 @@ class PayPalPaymentsForm(forms.Form):
 
     def is_subscription(self):
         return self.button_type == self.SUBSCRIBE
+
+    def get_endpoint(self):
+        if settings.PAYPAL_SANDBOX:
+            return SANDBOX_POSTBACK_ENDPOINT
+
+        return POSTBACK_ENDPOINT
 
 
 class PayPalEncryptedPaymentsForm(PayPalPaymentsForm):
