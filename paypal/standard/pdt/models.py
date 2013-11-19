@@ -67,13 +67,16 @@ class PayPalPDT(PayPalStandardBase):
             return POSTBACK_ENDPOINT
 
     def _verify_postback(self):
-        # ### Now we don't really care what result was, just whether a flag was set or not.
-        from paypal.standard.pdt.forms import PayPalPDTForm
+        """
+        Process the postback response for PDT notifications.
+        """
+        # Now we don't really care what result was, just whether a flag was
+        # set or not.
         result = False
+
         response_list = self.response.split('\n')
-        response_dict = {}
         for i, line in enumerate(response_list):
-            unquoted_line = unquote_plus(line).strip()        
+            unquoted_line = unquote_plus(line).strip()
             if i == 0:
                 self.st = unquoted_line
                 if self.st == "SUCCESS":
@@ -85,18 +88,16 @@ class PayPalPDT(PayPalStandardBase):
                     LOGGER.error("Paypal's postback validation has errors: "
                                  "%s" % self.response)
                     break
-                try:                        
+
+                try:
                     if not unquoted_line.startswith(' -'):
-                        k, v = unquoted_line.split('=')                        
-                        response_dict[k.strip()] = v.strip()
-                except ValueError, e:
+                        k, v = unquoted_line.split('=')
+                        setattr(self, k.strip(), v.strip())
+                except ValueError:
                     pass
 
-        qd = QueryDict('', mutable=True)
-        qd.update(response_dict)
-        qd.update(dict(ipaddress=self.ipaddress, st=self.st, flag_info=self.flag_info))
-        pdt_form = PayPalPDTForm(qd, instance=self)
-        pdt_form.save(commit=False)
+        self.save()
+        return result
 
     def send_signals(self):
         # Send the PDT signals...
