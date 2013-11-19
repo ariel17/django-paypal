@@ -64,8 +64,11 @@ def pdt(request, item_check_callable=None, template="pdt/pdt.html",
             if not failed:
                 # The PDT object gets saved during verify
                 pdt_obj.verify(item_check_callable)
-                LOGGER.info("PDT validation was successful. Object saved: %s" %
-                            pdt_obj)
+                LOGGER.info("PDT validation status: %s" % pdt_obj.st)
+                LOGGER.info("Object saved: %s" % pdt_obj)
+
+                if pdt_obj.st != "SUCCESS":
+                    failed = True
     else:
         pass  # we ignore any PDT requests that don't have a transaction id
         LOGGER.warn("Ignored request since txn_id parameter is missing.")
