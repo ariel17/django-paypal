@@ -91,10 +91,10 @@ class PayPalPDT(PayPalStandardBase):
                 self.st = unquoted_line
                 if self.st == "SUCCESS":
                     result = True
+                    self.set_flag(line)
                     LOGGER.info("Paypal's postback validation was succesful.")
             else:
                 if self.st != "SUCCESS":
-                    self.set_flag(line)
                     LOGGER.error("Paypal's postback validation has errors: "
                                  "%s" % self.response)
                     break
