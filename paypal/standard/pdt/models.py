@@ -117,15 +117,15 @@ class PayPalPDT(PayPalStandardBase):
         if not self.payment_fee:
             self.payment_fee = 0
 
+        # Decoding all unicode to utf-8
+        self.payer_business_name = self.payer_business_name.decode(
+            "utf-8", "ignore")
+        self.first_name = self.first_name.decode("utf-8", "ignore")
+        self.last_name = self.last_name.decode("utf-8", "ignore")
+
         # Saving current information
         try:
             self.save()
-
-        except UnicodeDecodeError:
-            self.payer_business_name = self.payer_business_name.decode(
-                "utf-8", "ignore")
-            self.first_name = self.first_name.decode("utf-8", "ignore")
-            self.last_name = self.last_name.decode("utf-8", "ignore")
 
         except:
             self.payment_date = None
