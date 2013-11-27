@@ -104,10 +104,14 @@ class PayPalPDT(PayPalStandardBase):
                         k, v = unquoted_line.split('=')
                         response_dict[k.strip()] = v.strip()
 
-                        if not k.split() != "payment_date":
+                        if not k.strip() != "payment_date":
                             setattr(self, k.strip(), v.strip())
+
                 except ValueError:
                     pass
+
+        if not self.item_number:
+            self.item_number = 0
 
         # Saving current information
         self.save()
