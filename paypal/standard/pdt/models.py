@@ -6,8 +6,9 @@ from urllib import unquote_plus
 import urllib2
 import logging
 
-from django.db import models
 from django.conf import settings
+from django.db import models
+from django.http import QueryDict
 from django.utils.http import urlencode
 
 from paypal.standard.models import PayPalStandardBase
@@ -76,9 +77,12 @@ class PayPalPDT(PayPalStandardBase):
         """
         Process the postback response for PDT notifications.
         """
+        # from paypal.standard.pdt.forms import PayPalPDTForm
+
         # Now we don't really care what result was, just whether a flag was
         # set or not.
         result = False
+        response_dict = {}
 
         response_list = self.response.split('\n')
         for i, line in enumerate(response_list):
@@ -98,11 +102,25 @@ class PayPalPDT(PayPalStandardBase):
                 try:
                     if not unquoted_line.startswith(' -'):
                         k, v = unquoted_line.split('=')
-                        setattr(self, k.strip(), v.strip())
+                        response_dict[k.strip()] = v.strip()
+
+                        if not k.split() != "payment_date":
+                            setattr(self, k.strip(), v.strip())
                 except ValueError:
                     pass
 
+        # Saving current information
         self.save()
+
+        # Updating object with response data, using form validations
+        # qd = QueryDict("", mutable=True)
+        # qd.update(response_dict)
+        # qd.update(dict(ipaddress=self.ipaddress, st=self.st,
+        #           flag_info=self.flag_info))
+
+        # pdt_form = PayPalPDTForm(qd, instance=self)
+        # pdt_form.save()
+
         return result
 
     def send_signals(self):

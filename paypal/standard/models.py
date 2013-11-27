@@ -6,7 +6,8 @@ import logging
 from django.db import models
 
 from paypal.standard.helpers import duplicate_txn_id, check_secret
-from paypal.standard.conf import RECEIVER_EMAIL, POSTBACK_ENDPOINT, SANDBOX_POSTBACK_ENDPOINT
+from paypal.standard.conf import RECEIVER_EMAIL, POSTBACK_ENDPOINT, \
+    SANDBOX_POSTBACK_ENDPOINT
 
 
 LOGGER = logging.getLogger(__name__)
@@ -32,7 +33,10 @@ except ImportError:
 
 
 class PayPalStandardBase(Model):
-    """Meta class for common variables shared by IPN and PDT: http://tinyurl.com/cuq6sj"""
+    """
+    Meta class for common variables shared by IPN and PDT:
+    http://tinyurl.com/cuq6sj
+    """
     # @@@ Might want to add all these one distant day.
     # FLAG_CODE_CHOICES = (
     # PAYMENT_STATUS_CHOICES = "Canceled_ Reversal Completed Denied Expired Failed Pending Processed Refunded Reversed Voided".split()
