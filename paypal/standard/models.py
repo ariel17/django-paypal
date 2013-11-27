@@ -274,7 +274,9 @@ class PayPalStandardBase(Model):
                 pass
 
         self.save()
+        LOGGER.info("Sending signals...")
         self.send_signals()
+        LOGGER.info("DONE.")
 
     def verify_secret(self, form_instance, secret):
         """Verifies an IPN payment over SSL using EWP."""
