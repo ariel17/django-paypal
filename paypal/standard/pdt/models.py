@@ -111,6 +111,12 @@ class PayPalPDT(PayPalStandardBase):
         if not self.item_number:
             self.item_number = 0
 
+        if not self.payment_gross:
+            self.payment_gross = 0
+
+        if not self.payment_fee:
+            self.payment_fee = 0
+
         # Saving current information
         try:
             self.save()
