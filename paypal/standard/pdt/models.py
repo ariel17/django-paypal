@@ -114,7 +114,11 @@ class PayPalPDT(PayPalStandardBase):
             self.item_number = 0
 
         # Saving current information
-        self.save()
+        try:
+            self.save()
+        except:
+            self.payment_date = None
+            self.save()
 
         # Updating object with response data, using form validations
         # qd = QueryDict("", mutable=True)
