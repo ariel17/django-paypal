@@ -103,9 +103,7 @@ class PayPalPDT(PayPalStandardBase):
                     if not unquoted_line.startswith(' -'):
                         k, v = unquoted_line.split('=')
                         response_dict[k.strip()] = v.strip()
-
-                        if not k.strip() != "payment_date":
-                            setattr(self, k.strip(), v.strip())
+                        setattr(self, k.strip(), v.strip())
 
                 except ValueError:
                     pass
@@ -134,6 +132,8 @@ class PayPalPDT(PayPalStandardBase):
     def send_signals(self):
         # Send the PDT signals...
         if self.flag:
+            LOGGER.info("Sending signals: pdt_failed")
             pdt_failed.send(sender=self)
         else:
+            LOGGER.info("Sending signals: pdt_successful")
             pdt_successful.send(sender=self)

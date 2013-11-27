@@ -314,7 +314,6 @@ class PayPalStandardBase(Model):
             elif self.is_subscription_modified():
                 subscription_modify.send(sender=self) 
 
-
     def initialize(self, request):
         """Store the data we'll need to make the postback from the request object."""
         self.query = getattr(request, request.method).urlencode()
