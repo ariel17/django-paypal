@@ -108,14 +108,9 @@ class PayPalPDT(PayPalStandardBase):
                 except ValueError:
                     pass
 
-        if not self.item_number:
-            self.item_number = 0
-
-        if not self.payment_gross:
-            self.payment_gross = 0
-
-        if not self.payment_fee:
-            self.payment_fee = 0
+        for field in ("item_number", "payment_gross", "payment_fee"):
+            if field in self.__dict__:
+                setattr(self, field, 0)
 
         # Decoding all unicode to utf-8
         self.payer_business_name = self.payer_business_name.decode(
