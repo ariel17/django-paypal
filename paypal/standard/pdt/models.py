@@ -109,7 +109,7 @@ class PayPalPDT(PayPalStandardBase):
                     pass
 
         for field in ("item_number", "payment_gross", "payment_fee"):
-            if field in self.__dict__:
+            if field in self.__dict__ and not getattr(self, field):
                 setattr(self, field, 0)
 
         # Decoding all unicode to utf-8
